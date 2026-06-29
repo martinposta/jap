@@ -161,6 +161,10 @@ a:hover { text-decoration-color: var(--indigo); }
   border-right: 1px solid var(--paper-grid);
   padding: 18px 0 60px;
   overflow-y: auto;
+  position: sticky;
+  top: var(--header-h);
+  height: calc(100vh - var(--header-h));
+  align-self: flex-start;
 }
 
 .sidebar-section-label {
@@ -464,8 +468,16 @@ p { margin: 0 0 14px; color: var(--ink); }
   display: flex;
   justify-content: center;
   gap: 10px;
+  margin-bottom: 14px;
+}
+
+.flash-actions-secondary {
+  display: flex;
+  justify-content: center;
   margin-bottom: 30px;
 }
+
+.flash-actions-secondary .btn { font-size: 13px; }
 
 .btn {
   font-family: var(--font-body);

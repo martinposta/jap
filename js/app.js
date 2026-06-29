@@ -53,12 +53,13 @@
   /* ---------- flat page list & lookup ---------- */
 
   function allPages() {
-    return [...COURSE.lessons, ...COURSE.appendices, COURSE.outro];
+    return [...COURSE.lessons, ...(COURSE.drills || []), ...COURSE.appendices, COURSE.outro];
   }
   function findPage(id) {
     return allPages().find(p => p.id === id);
   }
   function pageLabel(page) {
+    if (page.navLabel) return page.navLabel;
     if (page.number != null) return String(page.number).padStart(2, "0");
     if (page.id === "outro") return "—";
     return page.id.replace(/^p/, "").toUpperCase();
@@ -115,11 +116,22 @@
 
   /* ---------- flashcards ---------- */
 
-  let fcState = { pageId: null, group: 0, index: 0 };
+  let fcState = { pageId: null, group: 0, index: 0, order: [] };
+
+  function shuffledIndices(n) {
+    const arr = Array.from({ length: n }, (_, i) => i);
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  }
 
   function renderFlashcardSection(page) {
     if (!page.flashcardGroups || page.flashcardGroups.length === 0) return "";
-    if (fcState.pageId !== page.id) fcState = { pageId: page.id, group: 0, index: 0 };
+    if (fcState.pageId !== page.id) {
+      fcState = { pageId: page.id, group: 0, index: 0, order: shuffledIndices(page.flashcardGroups[0].cards.length) };
+    }
 
     const groupTabs = page.flashcardGroups.map((g, i) =>
       `<button class="btn ${i === fcState.group ? "primary" : "ghost"}" data-fc-group="${i}">${esc(g.name)}</button>`
@@ -133,6 +145,9 @@
       </div>
       <div class="flashcard-stage" id="fc-stage"></div>
       <div class="flash-actions" id="fc-actions"></div>
+      <div class="flash-actions-secondary">
+        <button class="btn ghost" id="fc-shuffle">🔀 Zamíchat znovu</button>
+      </div>
     `;
   }
 
@@ -145,8 +160,9 @@
     const progress = document.getElementById("fc-progress");
     if (!stage) return;
 
-    const card = group.cards[fcState.index];
-    const known = isCardKnown(page.id, fcState.group, fcState.index);
+    const realIndex = fcState.order[fcState.index];
+    const card = group.cards[realIndex];
+    const known = isCardKnown(page.id, fcState.group, realIndex);
     const knownCount = group.cards.filter((_, i) => isCardKnown(page.id, fcState.group, i)).length;
 
     stage.innerHTML = `
@@ -169,12 +185,12 @@
       <button class="btn ghost" id="fc-next">Další →</button>
     `;
 
-    progress.textContent = `Karta ${fcState.index + 1} / ${group.cards.length} · umím ${knownCount}/${group.cards.length}`;
+    progress.textContent = `Karta ${fcState.index + 1} / ${group.cards.length} · umím ${knownCount}/${group.cards.length} · pořadí zamícháno`;
 
     document.getElementById("fc-card").onclick = () => document.getElementById("fc-card").classList.toggle("flipped");
     document.getElementById("fc-know").onclick = (e) => {
       e.stopPropagation();
-      setCardKnown(page.id, fcState.group, fcState.index, !known);
+      setCardKnown(page.id, fcState.group, realIndex, !known);
       renderFlashcardStage(page);
     };
     document.getElementById("fc-prev").onclick = (e) => {
@@ -186,6 +202,14 @@
       fcState.index = (fcState.index + 1) % group.cards.length;
       renderFlashcardStage(page);
     };
+    const shuffleBtn = document.getElementById("fc-shuffle");
+    if (shuffleBtn) {
+      shuffleBtn.onclick = () => {
+        fcState.order = shuffledIndices(group.cards.length);
+        fcState.index = 0;
+        renderFlashcardStage(page);
+      };
+    }
   }
 
   function wireFlashcards(page) {
@@ -194,6 +218,7 @@
       btn.onclick = () => {
         fcState.group = parseInt(btn.dataset.fcGroup, 10);
         fcState.index = 0;
+        fcState.order = shuffledIndices(page.flashcardGroups[fcState.group].cards.length);
         document.querySelectorAll("[data-fc-group]").forEach(b => b.classList.remove("primary"));
         document.querySelectorAll("[data-fc-group]").forEach(b => b.classList.add("ghost"));
         btn.classList.add("primary");
@@ -314,6 +339,8 @@
     sidebar.innerHTML = `
       <div class="sidebar-section-label">Lekce</div>
       <ul class="nav-list">${COURSE.lessons.map(l => navItemHtml(l, currentId)).join("")}</ul>
+      <div class="sidebar-section-label">Trénink</div>
+      <ul class="nav-list">${(COURSE.drills || []).map(d => navItemHtml(d, currentId)).join("")}</ul>
       <div class="sidebar-section-label">Přílohy</div>
       <ul class="nav-list">${COURSE.appendices.map(a => navItemHtml(a, currentId)).join("")}</ul>
       <div class="sidebar-section-label">Závěr</div>
