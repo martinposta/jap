@@ -3,36 +3,54 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>日本語 — Japonština pro fanoušky anime</title>
-<meta name="description" content="Kurz základů japonštiny pro úplné začátečníky, postavený kolem porozumění anime a mangám bez titulků.">
-
+<title>Japanese From Zero! — Digitální kurz</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Zen+Old+Mincho:wght@400;500;600;700&family=Zen+Maru+Gothic:wght@400;500;700&family=Work+Sans:wght@400;500;600;700&family=JetBrains+Mono:ital,wght@0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
-
+<link href="https://fonts.googleapis.com/css2?family=Zen+Old+Mincho:wght@400;600;700&family=Zen+Maru+Gothic:wght@400;500;700&family=Work+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
-<header class="site-header">
-  <button class="menu-toggle" id="menu-toggle" aria-label="Otevřít navigaci">☰</button>
-  <a href="#l0" class="brand">
-    <span class="brand-mark" id="brand-title">日本語</span>
-    <span class="brand-sub" id="brand-sub">Japonština pro fanoušky anime</span>
-  </a>
-  <div class="header-progress" id="progress-text"></div>
-  <div class="stamp-row" id="progress-dots"></div>
-</header>
-
-<div class="layout">
-  <nav class="sidebar" id="sidebar"></nav>
-  <div class="scrim" id="scrim"></div>
-
-  <main class="content">
-    <div class="content-inner" id="content-inner"></div>
-  </main>
+<!-- ===== BOOK SELECTOR ===== -->
+<div id="book-selector-overlay" class="book-selector-overlay">
+  <div class="book-selector-inner">
+    <div class="book-selector-logo">
+      <span class="logo-jp">日本語</span>
+      <span class="logo-sub">Japanese From Zero! — Digitální kurz</span>
+    </div>
+    <p class="book-selector-tagline">Vyber knihu a začni studovat</p>
+    <div class="book-grid" id="book-grid"></div>
+    <p class="book-selector-note">Verze <span id="version-label"></span> · <span id="version-date"></span></p>
+  </div>
 </div>
 
+<!-- ===== MAIN APP ===== -->
+<div id="app" class="app hidden">
+
+  <header class="site-header">
+    <button class="menu-toggle" id="menu-toggle" aria-label="Navigace">☰</button>
+    <div class="header-brand" id="header-brand">
+      <span class="header-book-badge" id="header-book-badge">Book 1</span>
+      <span class="header-title" id="header-title">Japanese From Zero!</span>
+    </div>
+    <div class="header-right">
+      <div class="header-progress" id="header-progress"></div>
+      <button class="book-switch-btn" id="book-switch-btn" title="Přepnout knihu">📚</button>
+    </div>
+  </header>
+
+  <div class="layout">
+    <nav class="sidebar" id="sidebar"></nav>
+    <div class="scrim" id="scrim"></div>
+    <main class="content">
+      <div class="content-inner" id="content-inner"></div>
+    </main>
+  </div>
+
+</div>
+
+<script src="js/data-helpers.js"></script>
+<script src="js/data-book1.js"></script>
 <script src="js/data.js"></script>
 <script src="js/app.js"></script>
 </body>
