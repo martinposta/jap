@@ -1,97 +1,88 @@
-# 日本語 — Japanese From Zero! Digitální kurz
+# 日本語 — Japonština pro fanoušky anime
 
-Kompletní webová aplikace pokrývající sérii **Japanese From Zero!** knih 1–5.
-Aktuálně plně zpracována: **Book 1** (Pre-lekce A–D + Lekce 1–10).
+Webová aplikace s kurzem základů japonštiny: 13 lekcí, 4 přílohy, kartičky na
+opakování, kvízy a hanko razítka za dokončené lekce (postup se ukládá v
+prohlížeči, vydrží i po zavření okna).
 
-**Žádný build krok, žádné závislosti, žádný server** — jen statické soubory pro GitHub Pages.
+Žádný build krok, žádné závislosti — jen statické soubory. Přesně pro GitHub
+Pages.
 
----
-
-## Struktura souborů
+## Soubory
 
 ```
-index.html               — HTML kostra, načítá vše ostatní
-css/
-  style.css              — veškerý design a layout
-js/
-  data-helpers.js        — kana tabulky a sdílené funkce (NAČÍST JAKO PRVNÍ)
-  data-book1.js          — obsah Book 1: pre-lekce A–D + lekce 1–10
-  data.js                — COURSE export a metadata knih 2–5
-  app.js                 — logika appky: rendering, quiz, kartičky, progress
+index.html       — kostra stránky
+css/style.css     — veškerý vzhled
+js/data.js        — VEŠKERÝ OBSAH KURZU (lekce, slovíčka, kvízy, kartičky)
+js/app.js         — vykreslování, navigace, kvízy, kartičky, ukládání postupu
 ```
-
-### Jak přidat obsah Book 2 v budoucnu
-
-1. Vytvoř soubor `js/data-book2.js` stejnou strukturou jako `data-book1.js`
-2. Přidej `<script src="js/data-book2.js"></script>` do `index.html` (za data-book1.js)
-3. V `data.js` nastav `locked: false` u Book 2 a přidej `pages: BOOK2_PAGES`
-4. Hotovo — menu se automaticky odemkne
-
----
 
 ## Nasazení na GitHub Pages
 
-### Varianta A — přes web (nejjednodušší)
+### Varianta A — bez gitu, přes web (nejjednodušší)
 
-1. Vytvoř nové GitHub repo (např. `japonsky-kurz`)
-2. **Add file → Upload files** — přetáhni celý obsah této složky (ne složku samotnou, ale její obsah)
-3. **Commit changes**
-4. **Settings → Pages → Branch: main, / (root) → Save**
-5. Za chvíli běží na `https://tvoje-jmeno.github.io/japonsky-kurz/`
+1. Na GitHub.com si vytvoř nový repozitář (např. `japonsky-kurz`).
+2. V repozitáři klikni na **Add file → Upload files**.
+3. Přetáhni do něj **celý obsah téhle složky** (soubor `index.html` a složky
+   `css` a `js` — ne samotnou složku `japanese-course`, ale to, co je v ní).
+4. Commitni (tlačítko **Commit changes**).
+5. Jdi do **Settings → Pages**.
+6. U "Branch" vyber `main` a složku `/ (root)`, ulož.
+7. Za pár desítek vteřin bude appka na `https://tvoje-jméno.github.io/japonsky-kurz/`.
 
-### Varianta B — git
+### Varianta B — přes git
 
 ```bash
+cd japanese-course
 git init
 git add .
-git commit -m "JFZ digitalni kurz v2.0.0"
+git commit -m "Japonský kurz pro anime fans"
 git branch -M main
-git remote add origin https://github.com/JMENO/REPO.git
+git remote add origin https://github.com/TVOJE-JMENO/NAZEV-REPA.git
 git push -u origin main
 ```
 
-Pak totéž Pages nastavení jako výše.
+Pak stejně jako výše: **Settings → Pages → Branch: main, / (root)**.
 
-### Aktualizace (přidání obsahu)
+## Jak přidat novou lekci / cvičení / kartičku
 
-Uprav soubor(y) v `js/`, pak:
-```bash
-git add js/
-git commit -m "Přidána Lekce X / Book 2"
-git push
+Veškerý obsah je v `js/data.js`. Stránka samotná (`index.html`) ani logika
+(`js/app.js`) se při běžném přidávání obsahu nemění.
+
+Nová lekce je objekt v poli `LESSONS`:
+
+```js
+{
+  id: "l13",                              // musí být unikátní
+  number: 13,
+  eyebrow: "Lekce 13",
+  title: "Název lekce",
+  blocks: [
+    { type: "p", text: "Vysvětlující text." },
+    { type: "vocab", items: [
+      { jp: "言葉", romaji: "kotoba", cz: "slovo" },
+    ]},
+  ],
+  flashcardGroups: [
+    { name: "Slovíčka", cards: [
+      { jp: "言葉", romaji: "kotoba", cz: "slovo" },
+    ]},
+  ],
+  quiz: [
+    { q: "Co znamená 言葉?", options: ["slovo","kniha","ruka","oko"], correct: 0 },
+  ],
+},
 ```
-GitHub Pages se automaticky přenačte do ~60 sekund.
 
----
+Přehled všech typů bloků je v komentáři na začátku `data.js`. Appendix (Příloha)
+má úplně stejný tvar, jen patří do pole `APPENDICES` místo `LESSONS`.
 
-## Progress (postup učení)
+Postup uživatele (hotové lekce, kvízy, kartičky) se ukládá pod klíčem
+`id` lekce — pokud `id` později změníš, uživatelům se postup pro tu lekci
+"resetuje" (budou ji muset proklikat znovu), takže `id` po vydání měň jen
+když musíš.
 
-Postup se ukládá v **localStorage** prohlížeče pod klíčem `jfz2:`. Data zůstanou i po zavření okna — ale zmizí při vymazání dat prohlížeče nebo v anonymním okně.
+## Pokud budeš chtít pokračovat s Claude Code
 
-Každá lekce se označí jako hotová buď:
-- ručně tlačítkem „Označit lekci jako hotovou"
-- automaticky po zodpovězení všech quiz otázek správně
-
----
-
-## Verze
-
-| Verze | Datum | Co je nové |
-|-------|-------|-----------|
-| 2.0.0 | 2026-06-29 | Kompletní přepis: Book 1 z JFZ knih, menu pro B1–B5, nový design |
-| 1.1.0 | 2026-06-25 | Opravy, tréninkové sekce, anime slovník |
-| 1.0.0 | 2026-06-22 | První vydání |
-
----
-
-## Plán do budoucna
-
-- [ ] Book 2 — Katakana, slovesné skupiny, te-forma základy
-- [ ] Book 3 — Te-forma kompletně, plain form, podmínky
-- [ ] Book 4 — Kauzace, pasivum, potenciál
-- [ ] Book 5 — Kanji systém, JLPT N4
-- [ ] Google přihlášení + cloud sync (Firebase) — progress přenositelný mezi zařízeními
-
----
-
-*Digitalizováno z: Japanese From Zero! Books 1–5, George Trombley & Yukari Takenaka*
+Pro tenhle typ projektu (běžící repozitář, opakované úpravy, nasazování) je
+Claude Code obvykle pohodlnější než chat — má přímý přístup k repu na disku a
+nemusí se nic kopírovat sem a tam.
